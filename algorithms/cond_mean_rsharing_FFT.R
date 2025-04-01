@@ -9,33 +9,35 @@
 ##
 
 
-discretize_gamma_dist <- function(n, h, param1, param2, m = "lower")
+discretize_gamma_dist <- function(n, h, param1, param2, m = "lower", nn = 27000)
 {
     # Référence : Notes de cours du chapitre 1, partie 1, du cours ACT-3000.
     fmp <- numeric(n)
-    seq_n <- seq(0, n - 1)
+    nn <- min(nn / h, n)
+    seq_n <- seq(0, nn - 1)
+    vecteur_Frep <- pgamma(seq_n[2:nn]* h, param1, param2)
+
+    fmp[1] <- pgamma(h, param1, param2)
+    fmp[2:(nn-2)] <- head(diff(vecteur_Frep), -1)
+    fmp[1:(nn - 1)] <- c(fmp[1:(nn-2)], 1 - sum(fmp[1:(nn-2)]))
+
+
     if (m == "lower")
     {
-        fmp[1] <- 0
-        fmp[2:n] <- diff(pgamma(seq_n * h, param1, param2))
-        # fmp[2:n] <- pgamma(seq_n[2:n] * h, param1, param2) -
-        # pgamma((seq_n[2:n] - 1) * h, param1, param2)
+        return(c(0, head(fmp, -1)))
     }
     else if (m == "upper")
     {
-        fmp[1] <- pgamma(h, param1, param2)
-        fmp[2:n] <- diff(pgamma((seq_n + 1) * h, param1, param2))
-        # fmp[2:n] <- pgamma((seq_n[2:n] + 1) * h, param1, param2) -
-        #     pgamma(seq_n[2:n] * h, param1, param2)
+        return(fmp)
     }
     else
     {
         stop("Méthode non reconnue")
     }
-
-    fmp
 }
 
+ff <- discretize_gamma_dist(2^18, 0.001, 0.1, 0.05)
+sum(ff * 0.001 * (0:(2^18 - 1)))
 evaluate_pgf_Poisson <- function(t, lambda)
 {
     exp( lambda * (t - 1) )
@@ -59,7 +61,7 @@ calculate_cond_mean_rsharing_FFT <- function(nfft, param_lambda, param_alpha,
 
     phiBi <- matrix(numeric(nfft * length(param_lambda)),
                     nrow = length(param_lambda))
-
+    #browser()
     # Étapes 1-3, complétées différemment. Le but est de retrouver fS.
     for (i in seq_along(param_lambda))
     {
@@ -102,7 +104,7 @@ calculate_cond_mean_rsharing_FFT <- function(nfft, param_lambda, param_alpha,
     # }
 
     # Essai, déboguage
-    e_vec <- exp(-1i * 2 * pi * ((h * nfft_vec) / (h * nfft)))
+    e_vec <- exp(-2i * pi * ((nfft_vec) / (nfft)))
     # e_vec <- exp(1i * 2 * pi * (h * nfft_vec))
     # Définition cohérente avec l'aide de la fonction "fft".
 
@@ -134,36 +136,39 @@ params_data <- read.csv("params_belgian.csv")
 
 # Espérance de S
 sum(params_data[1:3, 1] * (params_data[1:3, 2] / params_data[1:3, 3]))
+sum(params_data$lambda[1:3] *
+        ( params_data$alpha[1:3] / (params_data$beta[1:3]^2) ) *
+        (1 + params_data$alpha[1:3]))
 
-params_data[1:3, 1] * (params_data[1:3, 2] / params_data[1:3, 3])
+params_data[1:2, 1] * (params_data[1:2, 2] / params_data[1:2, 3])
 
-nfft <- 2^15
-h <- 1
+nfft <- 2^14
+h <- 0.1
 
-res <- calculate_cond_mean_rsharing_FFT(nfft, params_data[1:3, 1],
-                                        params_data[1:3, 2],
-                                        params_data[1:3, 3], h)
+res <- calculate_cond_mean_rsharing_FFT(nfft, params_data[1:2, 1],
+                                        params_data[1:2, 2],
+                                        params_data[1:2, 3], h)
 
 dim(res)
-colSums(res[,1:5])
-params_data[1:3,]
-params_data[1:3, 1] * (params_data[1:3, 2] / params_data[1:3, 3])
+colSums(res[,1:10]) / h
+params_data[1:2,]
+params_data[1:2, 1] * (params_data[1:2, 2] / params_data[1:2, 3])
 t(res)
 
 
-all.equal(colSums(res)[1:500], (h * seq(0, nfft - 1))[1:500], tolerance = 10^(-4))
+all.equal(colSums(res)[1:50], (h * seq(0, nfft - 1))[1:50], tolerance = 10^(-4))
 # Voir page 126 de [Blier-Wong et al., 2025] pour commentaire sur la portée de
 # ce test (test peu bon pour les queues de distribution, car pmf de S très
 # faible).
 
-sum(params_data[1:30, 1] * (params_data[1:30, 2] / params_data[1:30, 3]))
+sum(params_data[1:50, 1] * (params_data[1:50, 2] / params_data[1:50, 3]))
 
-sum(params_data$lambda[1:30] *
-        ( params_data$alpha[1:30] / (params_data$beta[1:30]^2) ) *
-        (1 + params_data$alpha[1:30]))
+sum(params_data$lambda[1:50] *
+        ( params_data$alpha[1:50] / (params_data$beta[1:50]^2) ) *
+        (1 + params_data$alpha[1:50]))
 
-nfft <- 2^21
-h <- 0.01
+nfft <- 2^18
+h <- 0.1
 
 time1 <- Sys.time()
 res <- calculate_cond_mean_rsharing_FFT(nfft, params_data[1:30, 1],
