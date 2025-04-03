@@ -52,7 +52,7 @@ compute_cm <- function(kmax, h, params_data, discr_method)
     # Assign parameters
     debut <- Sys.time()
     for(i in 1:n_participants) {
-        lam[[i]] <- lambdas[i]
+        lam[[i]] <- params_data$lambda[i]
         fc[[i]] <- discrete_sev(kmax, h, discr_method, params_data$alpha[i],
                                 params_data$beta[i])
         if (i %% 100 == 0)
