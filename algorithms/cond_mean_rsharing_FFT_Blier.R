@@ -31,6 +31,8 @@ discrete_sev <- function(nfft, h, method, alpha, beta)
 #                             m = "lower"))
 
 ## Mean-preserving
+h <- 25
+kmax <- 2^15
 ff <- discrete_sev(kmax, h, "unbiased", params_data$alpha[2], params_data$beta[2])
 sum(0:(kmax - 1) * h * ff)
 params_data$alpha[2] / params_data$beta[2]
