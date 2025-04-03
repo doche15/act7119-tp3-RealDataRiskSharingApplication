@@ -31,9 +31,9 @@ discrete_sev <- function(nfft, h, method, alpha, beta)
 #                             m = "lower"))
 
 ## Mean-preserving
-ff <- discrete_sev(kmax, h, "unbiased", params_data$alpha[2], params_data$beta[2])
-sum(0:(kmax - 1) * h * ff)
-params_data$alpha[2] / params_data$beta[2]
+# ff <- discrete_sev(kmax, h, "unbiased", params_data$alpha[2], params_data$beta[2])
+# sum(0:(kmax - 1) * h * ff)
+# params_data$alpha[2] / params_data$beta[2]
 
 compute_cm <- function(kmax, h, params_data, discr_method)
 {
@@ -50,7 +50,7 @@ compute_cm <- function(kmax, h, params_data, discr_method)
     # Assign parameters
     debut <- Sys.time()
     for(i in 1:n_participants) {
-        lam[[i]] <- lambdas[i]
+        lam[[i]] <- params_data$lambda[i]
         fc[[i]] <- discrete_sev(kmax, h, discr_method, params_data$alpha[i],
                                 params_data$beta[i])
         if (i %% 100 == 0)

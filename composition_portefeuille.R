@@ -28,9 +28,9 @@ hist(betas, freq = FALSE)
 purepremiums <- lambdas * alphas / betas
 hist(purepremiums, freq = FALSE)
 
-summary(df_params)
 df_params <- cbind(test, alpha = alphas, beta = betas, lambda = lambdas,
                    premium = purepremiums)
+summary(df_params)
 
 ggplot(df_params, aes(x = long, y = lat, size = premium,
                       col = premium)) + geom_point(alpha = 0.2)
