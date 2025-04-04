@@ -60,6 +60,22 @@ compute_mean_prop_rsharing_by_simulation <- function(nsim, params_data)
     list(contributions = linear_factors %*% Sn_realizations, Sn_realizations = Sn_realizations)
 }
 
+compute_mean_prop_rsharing_translativity <- function(s, params_data)
+{
+  ES <- sum(params_data$lambda * params_data$alpha / params_data$beta)
+  EXi <- params_data$lambda * params_data$alpha / params_data$beta + params_data$cst
+  
+  s * (EXi / ES)
+}
+
+compute_mean_prop_rsharing_homogeneity <- function(s, params_data)
+{
+  ES <- sum(params_data$lambda * params_data$alpha / params_data$beta)
+  EXi <- params_data$lambda * params_data$alpha / params_data$beta * params_data$fact
+  
+  s * (EXi / ES)
+}
+
 
 # Test 1
 # params_data <- read.csv("params_belgian.csv")
