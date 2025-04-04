@@ -12,14 +12,13 @@ source("preprocessing/BelgianMTPL_P.R")
 # Fonction de calcul de l'espérance conditionnelle
 source("algorithms/cond_mean_rsharing_FFT_Blier.R")
 
-
-compute_cm(2^15, 0.5, params_data[1:1000, ], "unbiased")
-
 ## Analyse du portefeuille
 summary(params_data)
 lambdas <- params_data$lambda
 alphas <- params_data$alpha
 betas <- params_data$beta
+
+compute_cm(2^15, 0.5, params_data[1:1000, ], "unbiased")
 
 hist(lambdas, freq = FALSE)
 hist(alphas, freq = FALSE)
@@ -41,8 +40,6 @@ ggplot(df_params, aes(x = long, y = lat,
                       col = lambda)) + mapBelgium + geom_point(alpha = 1) +
     scale_color_distiller(palette = "OrRd", direction=1)
 
-
-
 ggplot(df_params, aes(x = bm, y = lambda)) + geom_point(alpha = 0.2)
 
 
@@ -51,17 +48,23 @@ aggregate(premium ~ sex, data = df_params, FUN = mean)
 aggregate(premium ~ use, data = df_params, FUN = mean)
 aggregate(premium ~ fuel, data = df_params, FUN = mean)
 aggregate(premium ~ ageph, data = df_params, FUN = mean) # intéressant
+ggplot(aggregate(premium ~ ageph, data = df_params, FUN = mean), aes(x = ageph, y = premium)) +
+  geom_point() # belle quadratique
 
 aggregate(lambda ~ coverage, data = df_params, FUN = mean)
 aggregate(lambda ~ sex, data = df_params, FUN = mean)
 aggregate(lambda ~ use, data = df_params, FUN = mean)
 aggregate(lambda ~ fuel, data = df_params, FUN = mean)
 aggregate(lambda ~ ageph, data = df_params, FUN = mean) # intéressant
-
+ggplot(aggregate(lambda ~ ageph, data = df_params, FUN = mean), aes(x = ageph, y = lambda)) +
+  geom_point() # similaire
 
 aggregate(alpha ~ coverage, data = df_params, FUN = mean)
 aggregate(alpha ~ sex, data = df_params, FUN = mean)
 aggregate(alpha ~ use, data = df_params, FUN = mean)
 aggregate(alpha ~ fuel, data = df_params, FUN = mean)
 aggregate(alpha ~ ageph, data = df_params, FUN = mean) # intéressant
+ggplot(aggregate(alpha ~ ageph, data = df_params, FUN = mean), aes(x = ageph, y = alpha)) +
+  geom_point()
+
 
