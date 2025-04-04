@@ -39,18 +39,18 @@ quantile_sep <- c(0, seq(n_subpools) * (1 / n_subpools))
 
 for (i in seq(n_subpools))
 {
-    # Création des sous-pools selon la fréquence de sinistres ("lambda")
-    quantile_inf <- quantile(data_subpools$lambda, quantile_sep[i])
-    quantile_sup <- quantile(data_subpools$lambda, quantile_sep[i + 1])
+    # Création des sous-pools selon la prime pure ("lambda")
+    quantile_inf <- quantile(data_subpools$prime_pure, quantile_sep[i])
+    quantile_sup <- quantile(data_subpools$prime_pure, quantile_sep[i + 1])
 
     temp_data_subpool <- NULL
     if (i == n_subpools)
     {
-        temp_data_subpool <- data_subpools[quantile_inf <= data_subpools$lambda & data_subpools$lambda <= quantile_sup,]
+        temp_data_subpool <- data_subpools[quantile_inf <= data_subpools$prime_pure & data_subpools$prime_pure <= quantile_sup,]
     }
     else
     {
-        temp_data_subpool <- data_subpools[quantile_inf <= data_subpools$lambda & data_subpools$lambda < quantile_sup,]
+        temp_data_subpool <- data_subpools[quantile_inf <= data_subpools$prime_pure & data_subpools$prime_pure < quantile_sup,]
     }
 
     write.csv(temp_data_subpool, paste0("donnees-sous-pools/sous-pool-", i, "-k", n_subpools, "--", Sys.Date(), ".csv"), row.names = FALSE)
@@ -60,17 +60,21 @@ subpool1 <- read.csv("donnees-sous-pools/sous-pool-1-k3--2025-04-04.csv")
 subpool2 <- read.csv("donnees-sous-pools/sous-pool-2-k3--2025-04-04.csv")
 subpool3 <- read.csv("donnees-sous-pools/sous-pool-3-k3--2025-04-04.csv")
 
-summary(subpool1$lambda) # valid, OK
-summary(subpool2$lambda) # valid, OK
-summary(subpool3$lambda) # valid, OK
+summary(subpool1$prime_pure) # valid, OK
+summary(subpool2$prime_pure) # valid, OK
+summary(subpool3$prime_pure) # valid, OK
 
 nrow(subpool1) + nrow(subpool2) + nrow(subpool3) # valid, OK.
 
 
 summary(subpool1)
-summary(subpool2)
-summary(subpool3)
+table(subpool1$sex) / nrow(subpool1)
 
+summary(subpool2)
+table(subpool2$sex) / nrow(subpool2)
+
+summary(subpool3)
+table(subpool3$sex) / nrow(subpool3)
 
 
 # %%%%%%%%%%%%%%%%%%%%%
