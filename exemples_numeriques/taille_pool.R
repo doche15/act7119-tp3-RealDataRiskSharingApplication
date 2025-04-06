@@ -60,9 +60,14 @@ val_range_n1000 = seq(4e4, 2e5)
 plot(cm_n1000$fs[val_range_n1000])
 sum(cm_n1000$fs[val_range_n1000])
 
+# paramètres graphique ----
+hjust = -0.3
+xlimits = c(0, 200)
+
 # analyse du risque 1 dans chacun des pools ----
 risk <- 1
 
+val_range_n3 = seq(1.7e4) # évite instabilité graphique
 # contributions
 contrib_n3_risk <- unlist(cm_n3$contrib[risk])[val_range_n3]
 contrib_n100_risk <- unlist(cm_n100$contrib[risk])[val_range_n100]
@@ -95,12 +100,12 @@ df_risk_n3 <- data.frame(x = contrib_n3_risk,
                          y = Fs3,
                          group = 'n = 3')
 
-df_risk_n100 <- data.frame(x = contrib_n100_risk, 
-                           y = Fs100,
+df_risk_n100 <- data.frame(x = c(0, contrib_n100_risk, 200), 
+                           y = c(0, Fs100, 1),
                            group = 'n = 100')
 
-df_risk_n1000 <- data.frame(x = contrib_n1000_risk, 
-                            y = Fs1000,
+df_risk_n1000 <- data.frame(x = c(0, contrib_n1000_risk, 200), 
+                            y = c(0, Fs1000, 1),
                             group = 'n = 1000')
 
 df_tot <- rbind(df_risk_n3,
@@ -109,30 +114,31 @@ df_tot <- rbind(df_risk_n3,
 
 df_tot$group = factor(df_tot$group, levels = c('n = 3', 'n = 100', 'n = 1000'))
 
-ggplot(df_tot, aes(x = x, y = y, color = group)) +
+plot_risk1 = ggplot(df_tot, aes(x = x, y = y, color = group)) +
   geom_line(linewidth = 1) +
-  labs(title = "Fonction de répartition des espérances conditionnelles",
-       color = "Taille des pools",
+  labs(color = "Taille du pool",
        y = expression("P" * "[" * E(X[1] ~ "|" ~ S) <= x * "]"),
-       subtitle = substitute(paste("Risque 1 : ", lambda[1] == lambda_val, ', ',
+       title = substitute(paste("Risque 1 : ", lambda[1] == lambda_val, ', ',
                                    alpha[1] == alpha_val, ', ', beta[1] == beta_val),
-                             list(lambda_val = round(pool_n3$lambda[risk], 2),
-                                  alpha_val = round(pool_n3$alpha[risk], 2),
+                             list(lambda_val = round(pool_n3$lambda[risk], 3),
+                                  alpha_val = round(pool_n3$alpha[risk], 3),
                                   beta_val = round(pool_n3$beta[risk], 4)))) +
-  xlim(0, 200) +
+  xlim(xlimits[1], xlimits[2]) +
   ylim(0, 1) +
   geom_vline(xintercept = purepremium, linetype = 'dashed') +
   theme_bw() +
-  scale_color_brewer(palette = "Purples") +
   annotate("text",
            x = purepremium,
            y = 0.4,
-           label = paste0("Prime pure = ", round(purepremium, 2), ' $'),
-           hjust = -0.1)
+           label = paste0("Prime pure = ", round(purepremium, 2)),
+           hjust = hjust,
+           size = 5) +
+  theme(legend.position = 'bottom')
 
 # analyse du risque 2 dans chacun des pools ----
 risk <- 2
 
+val_range_n3 = seq(2e4) # évite instabilité graphique
 # contributions
 contrib_n3_risk <- unlist(cm_n3$contrib[risk])[val_range_n3]
 contrib_n100_risk <- unlist(cm_n100$contrib[risk])[val_range_n100]
@@ -165,12 +171,12 @@ df_risk_n3 <- data.frame(x = contrib_n3_risk,
                          y = Fs3,
                          group = 'n = 3')
 
-df_risk_n100 <- data.frame(x = contrib_n100_risk, 
-                           y = Fs100,
+df_risk_n100 <- data.frame(x = c(0, contrib_n100_risk, 200), 
+                           y = c(0, Fs100, 1),
                            group = 'n = 100')
 
-df_risk_n1000 <- data.frame(x = contrib_n1000_risk, 
-                            y = Fs1000,
+df_risk_n1000 <- data.frame(x = c(0, contrib_n1000_risk, 200), 
+                            y = c(0, Fs1000, 1),
                             group = 'n = 1000')
 
 df_tot <- rbind(df_risk_n3,
@@ -179,26 +185,26 @@ df_tot <- rbind(df_risk_n3,
 
 df_tot$group = factor(df_tot$group, levels = c('n = 3', 'n = 100', 'n = 1000'))
 
-ggplot(df_tot, aes(x = x, y = y, color = group)) +
+plot_risk2 = ggplot(df_tot, aes(x = x, y = y, color = group)) +
   geom_line(linewidth = 1) +
-  labs(title = "Fonction de répartition des espérances conditionnelles",
-       color = "Taille des pools",
+  labs(color = "Taille du pool",
        y = expression("P" * "[" * E(X[2] ~ "|" ~ S) <= x * "]"),
-       subtitle = substitute(paste("Risque 2 : ", lambda[2] == lambda_val, ', ',
+       title = substitute(paste("Risque 2 : ", lambda[2] == lambda_val, ', ',
                                    alpha[2] == alpha_val, ', ', beta[2] == beta_val),
-                             list(lambda_val = round(pool_n3$lambda[risk], 2),
-                                  alpha_val = round(pool_n3$alpha[risk], 2),
+                             list(lambda_val = round(pool_n3$lambda[risk], 3),
+                                  alpha_val = round(pool_n3$alpha[risk], 3),
                                   beta_val = round(pool_n3$beta[risk], 4)))) +
-  xlim(0, 200) +
+  xlim(xlimits[1], xlimits[2]) +
   ylim(0, 1) +
   geom_vline(xintercept = purepremium, linetype = 'dashed') +
   theme_bw() +
-  scale_color_brewer(palette = "Purples") +
   annotate("text",
            x = purepremium,
            y = 0.4,
-           label = paste0("Prime pure = ", round(purepremium, 2), ' $'),
-           hjust = -0.1)
+           label = paste0("Prime pure = ", round(purepremium, 2)),
+           hjust = hjust,
+           size = 5) +
+  theme(legend.position = 'bottom')
 
 # analyse du risque 3 dans chacun des pools ----
 risk <- 3
@@ -236,12 +242,17 @@ df_risk_n3 <- data.frame(x = contrib_n3_risk,
                          y = Fs3,
                          group = 'n = 3')
 
-df_risk_n100 <- data.frame(x = contrib_n100_risk, 
-                           y = Fs100,
+
+test1 = c(0, Fs100, 1)
+test2 = c(0, contrib_n100_risk, 200)
+df_risk_n100 <- data.frame(x = test2, 
+                           y = test1,
                            group = 'n = 100')
 
-df_risk_n1000 <- data.frame(x = contrib_n1000_risk, 
-                            y = Fs1000,
+test3 = c(0, Fs1000, 1)
+test4 = c(0, contrib_n1000_risk, 200)
+df_risk_n1000 <- data.frame(x = test4, 
+                            y = test3,
                             group = 'n = 1000')
 
 df_tot <- rbind(df_risk_n3,
@@ -250,29 +261,53 @@ df_tot <- rbind(df_risk_n3,
 
 df_tot$group = factor(df_tot$group, levels = c('n = 3', 'n = 100', 'n = 1000'))
 
-ggplot(df_tot, aes(x = x, y = y, color = group)) +
+plot_risk3 = ggplot(df_tot, aes(x = x, y = y, color = group)) +
   geom_line(linewidth = 1) +
-  labs(title = "Fonction de répartition des espérances conditionnelles",
-       color = "Taille des pools",
+  labs(color = "Taille du pool",
        y = expression("P" * "[" * E(X[3] ~ "|" ~ S) <= x * "]"),
-       subtitle = substitute(paste("Risque 3 : ", lambda[3] == lambda_val, ', ',
+       title = substitute(paste("Risque 3 : ", lambda[3] == lambda_val, ', ',
                                    alpha[3] == alpha_val, ', ', beta[3] == beta_val),
-                             list(lambda_val = round(pool_n3$lambda[risk], 2),
-                                  alpha_val = round(pool_n3$alpha[risk], 2),
+                             list(lambda_val = round(pool_n3$lambda[risk], 3),
+                                  alpha_val = round(pool_n3$alpha[risk], 3),
                                   beta_val = round(pool_n3$beta[risk], 4)))) +
-  xlim(0, 200) +
+  xlim(xlimits[1], xlimits[2]) +
   ylim(0, 1) +
   geom_vline(xintercept = purepremium, linetype = 'dashed') +
   theme_bw() +
-  scale_color_brewer(palette = "Purples") +
   annotate("text",
            x = purepremium,
            y = 0.4,
-           label = paste0("Prime pure = ", round(purepremium, 2), ' $'),
-           hjust = -0.1)
+           label = paste0("Prime pure = ", round(purepremium, 2)),
+           hjust = hjust,
+           size = 5) +
+  theme(legend.position = 'bottom')
 
+# légende ----
+legend <- get_legend(ggplot(df_tot, aes(x = x, y = y, color = group)) +
+                       geom_line(linewidth = 1) +
+                       labs(color = "Taille du pool",
+                            y = expression("P" * "[" * E(X[3] ~ "|" ~ S) <= x * "]"),
+                            title = substitute(paste("Risque 3 : ", lambda[3] == lambda_val, ', ',
+                                                     alpha[3] == alpha_val, ', ', beta[3] == beta_val),
+                                               list(lambda_val = round(pool_n3$lambda[risk], 3),
+                                                    alpha_val = round(pool_n3$alpha[risk], 3),
+                                                    beta_val = round(pool_n3$beta[risk], 4)))) +
+                       xlim(xlimits[1], xlimits[2]) +
+                       ylim(0, 1) +
+                       geom_vline(xintercept = purepremium, linetype = 'dashed') +
+                       theme_bw() +
+                       annotate("text",
+                                x = purepremium,
+                                y = 0.4,
+                                label = paste0("Prime pure = ", round(purepremium, 2)),
+                                hjust = hjust,
+                                size = 5))
 
+legend_plot <- plot_grid(legend)
 
-
-
-
+# enregistre graphiques ----
+# title = "Fonction de répartition des espérances conditionnelles"
+ggsave("risk1.png", plot = plot_risk1, width = 5, height = 4, dpi = 300)
+ggsave("risk2.png", plot = plot_risk2, width = 5, height = 4, dpi = 300)
+ggsave("risk3.png", plot = plot_risk3, width = 5, height = 4, dpi = 300)
+ggsave("legend.png", plot = legend_plot, width = 3, height = 1, dpi = 300)
