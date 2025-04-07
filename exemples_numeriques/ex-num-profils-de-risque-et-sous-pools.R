@@ -7,6 +7,7 @@
 
 # Importation des paquetages
 library(ggplot2)
+library(ggpubr)
 
 
 # Importation des données de sous-pools
@@ -121,7 +122,7 @@ unif_rsharing_sp1_r1 <- support_S / RISK_ECH_SIZE
 mean_prop_rsharing_sp1_r1 <- (EX_sp1_r1 / ES_sp1) * support_S
 linear_reg_rsharing_sp1_r1 <- EX_sp1_r1 + (VarX_sp1_r1 / VarS_sp1) * (support_S - ES_sp1)
 cm_rsharing_sp1 <- compute_cm(nfft, h, subpool1_ech, "unbiased")
-# Temps : 249.3 secondes, 2025-04-04, avec "unbiased".
+# Temps : 241.2 secondes, 2025-04-07, avec "unbiased".
 cm_rsharing_sp1_r1 <- cm_rsharing_sp1$contrib[[1]]
 
 results_contrib_rsharing_sp1 <- data.frame(s = support_S,
@@ -140,34 +141,46 @@ cm_rsharing_sp1_r1[89900 / h]
 
 results_contrib_rsharing_sp1_reduced <- results_contrib_rsharing_sp1[(30100:89900) / h,]
 
+# results_contrib_rsharing_sp1_reduced_joined <- rbind(data.frame(s = results_contrib_rsharing_sp1_reduced$s,
+#                                                                 contribution = results_contrib_rsharing_sp1_reduced$unif_rsharing,
+#                                                                 methode = rep("Uniforme", nrow(results_contrib_rsharing_sp1_reduced))),
+#                                                      data.frame(s = results_contrib_rsharing_sp1_reduced$s,
+#                                                                 contribution = results_contrib_rsharing_sp1_reduced$mean_prop_rsharing,
+#                                                                 methode = rep("Au prorata des espérances", nrow(results_contrib_rsharing_sp1_reduced))),
+#                                                      data.frame(s = results_contrib_rsharing_sp1_reduced$s,
+#                                                                 contribution = results_contrib_rsharing_sp1_reduced$linear_reg_rsharing,
+#                                                                 methode = rep("Régression linéaire", nrow(results_contrib_rsharing_sp1_reduced))),
+#                                                      data.frame(s = results_contrib_rsharing_sp1_reduced$s,
+#                                                                 contribution = results_contrib_rsharing_sp1_reduced$cm_rsharing,
+#                                                                 methode = rep("Espérance conditionnelle", nrow(results_contrib_rsharing_sp1_reduced))))
+
+
 results_contrib_rsharing_sp1_reduced_joined <- rbind(data.frame(s = results_contrib_rsharing_sp1_reduced$s,
-                                                                contribution = results_contrib_rsharing_sp1_reduced$unif_rsharing,
-                                                                methode = rep("Uniforme", nrow(results_contrib_rsharing_sp1_reduced))),
-                                                     data.frame(s = results_contrib_rsharing_sp1_reduced$s,
-                                                                contribution = results_contrib_rsharing_sp1_reduced$mean_prop_rsharing,
+                                                                contribution = (results_contrib_rsharing_sp1_reduced$mean_prop_rsharing - results_contrib_rsharing_sp1_reduced$unif_rsharing) / results_contrib_rsharing_sp1_reduced$unif_rsharing,
                                                                 methode = rep("Au prorata des espérances", nrow(results_contrib_rsharing_sp1_reduced))),
                                                      data.frame(s = results_contrib_rsharing_sp1_reduced$s,
-                                                                contribution = results_contrib_rsharing_sp1_reduced$linear_reg_rsharing,
+                                                                contribution = (results_contrib_rsharing_sp1_reduced$linear_reg_rsharing - results_contrib_rsharing_sp1_reduced$unif_rsharing) / results_contrib_rsharing_sp1_reduced$unif_rsharing,
                                                                 methode = rep("Régression linéaire", nrow(results_contrib_rsharing_sp1_reduced))),
                                                      data.frame(s = results_contrib_rsharing_sp1_reduced$s,
-                                                                contribution = results_contrib_rsharing_sp1_reduced$cm_rsharing,
+                                                                contribution = (results_contrib_rsharing_sp1_reduced$cm_rsharing - results_contrib_rsharing_sp1_reduced$unif_rsharing) / results_contrib_rsharing_sp1_reduced$unif_rsharing,
                                                                 methode = rep("Espérance conditionnelle", nrow(results_contrib_rsharing_sp1_reduced))))
 
 
 # Référence :
 # https://stackoverflow.com/questions/14794599/how-to-change-line-width-in-ggplot
-ggplot(results_contrib_rsharing_sp1_reduced_joined) +
-    geom_line(aes(s / 1000, contribution, col = methode), size=1.4) +
-    xlab("s (en milliers)") +
-    ylab("Contribution") +
-    xlim(30000 / 1000, 90000 / 1000) +
-    ylim(20, 100) +
-    theme_classic() +
-    theme(axis.text = element_text(size=12),
-          axis.title = element_text(size=12),
-          legend.text = element_text(size=9),
-          legend.position = "bottom") +
-    guides(col = guide_legend(title = "Méthode"))
+# fig1 <- ggplot(results_contrib_rsharing_sp1_reduced_joined) +
+#     geom_line(aes(s / 1000, contribution, col = methode), size=1.4) +
+#     xlab("s (en milliers)") +
+#     ylab("Contribution") +
+#     xlim(30000 / 1000, 90000 / 1000) +
+#     ylim(20, 100) +
+#     theme_classic() +
+#     theme(axis.text = element_text(size=20),
+#           axis.title = element_text(size=20),
+#           legend.text = element_text(size=14),
+# 	    legend.title = element_text(size=16),
+#           legend.position = "bottom") +
+#     guides(col = guide_legend(title = "Méthode"))
 
 
 # Échantillon du sous-pool 2
@@ -180,8 +193,8 @@ unif_rsharing_sp2_r1 <- support_S / RISK_ECH_SIZE
 mean_prop_rsharing_sp2_r1 <- (EX_sp2_r1 / ES_sp2) * support_S
 linear_reg_rsharing_sp2_r1 <- EX_sp2_r1 + (VarX_sp2_r1 / VarS_sp2) * (support_S - ES_sp2)
 cm_rsharing_sp2 <- compute_cm(nfft, h, subpool2_ech, "unbiased")
-# Temps : 246.3 secondes, 2025-04-04, avec "unbiased".
-# Erreur obtenue : "Error in order(typeScores, scores) : argument lengths differ"
+# Temps : 252.5 secondes, 2025-04-07, avec "unbiased".
+
 cm_rsharing_sp2_r1 <- cm_rsharing_sp2$contrib[[1]]
 
 results_contrib_rsharing_sp2 <- data.frame(s = support_S,
@@ -201,34 +214,54 @@ cm_rsharing_sp2_r1[120000 / h]
 
 results_contrib_rsharing_sp2_reduced <- results_contrib_rsharing_sp2[(50100:119900) / h,]
 
+# results_contrib_rsharing_sp2_reduced_joined <- rbind(data.frame(s = results_contrib_rsharing_sp2_reduced$s,
+#                                                                 contribution = results_contrib_rsharing_sp2_reduced$unif_rsharing,
+#                                                                 methode = rep("Uniforme", nrow(results_contrib_rsharing_sp2_reduced))),
+#                                                      data.frame(s = results_contrib_rsharing_sp2_reduced$s,
+#                                                                 contribution = results_contrib_rsharing_sp2_reduced$mean_prop_rsharing,
+#                                                                 methode = rep("Au prorata des espérances", nrow(results_contrib_rsharing_sp2_reduced))),
+#                                                      data.frame(s = results_contrib_rsharing_sp2_reduced$s,
+#                                                                 contribution = results_contrib_rsharing_sp2_reduced$linear_reg_rsharing,
+#                                                                 methode = rep("Régression linéaire", nrow(results_contrib_rsharing_sp2_reduced))),
+#                                                      data.frame(s = results_contrib_rsharing_sp2_reduced$s,
+#                                                                 contribution = results_contrib_rsharing_sp2_reduced$cm_rsharing,
+#                                                                 methode = rep("Espérance conditionnelle", nrow(results_contrib_rsharing_sp2_reduced))))
+
+
 results_contrib_rsharing_sp2_reduced_joined <- rbind(data.frame(s = results_contrib_rsharing_sp2_reduced$s,
-                                                                contribution = results_contrib_rsharing_sp2_reduced$unif_rsharing,
-                                                                methode = rep("Uniforme", nrow(results_contrib_rsharing_sp2_reduced))),
-                                                     data.frame(s = results_contrib_rsharing_sp2_reduced$s,
-                                                                contribution = results_contrib_rsharing_sp2_reduced$mean_prop_rsharing,
+                                                                contribution = (results_contrib_rsharing_sp2_reduced$mean_prop_rsharing - results_contrib_rsharing_sp2_reduced$unif_rsharing) / results_contrib_rsharing_sp2_reduced$unif_rsharing,
                                                                 methode = rep("Au prorata des espérances", nrow(results_contrib_rsharing_sp2_reduced))),
                                                      data.frame(s = results_contrib_rsharing_sp2_reduced$s,
-                                                                contribution = results_contrib_rsharing_sp2_reduced$linear_reg_rsharing,
+                                                                contribution = (results_contrib_rsharing_sp2_reduced$linear_reg_rsharing - results_contrib_rsharing_sp2_reduced$unif_rsharing) / results_contrib_rsharing_sp2_reduced$unif_rsharing,
                                                                 methode = rep("Régression linéaire", nrow(results_contrib_rsharing_sp2_reduced))),
                                                      data.frame(s = results_contrib_rsharing_sp2_reduced$s,
-                                                                contribution = results_contrib_rsharing_sp2_reduced$cm_rsharing,
+                                                                contribution = (results_contrib_rsharing_sp2_reduced$cm_rsharing - results_contrib_rsharing_sp2_reduced$unif_rsharing) / results_contrib_rsharing_sp2_reduced$unif_rsharing,
                                                                 methode = rep("Espérance conditionnelle", nrow(results_contrib_rsharing_sp2_reduced))))
+
+
+j <-  data.frame(s = results_contrib_rsharing_sp2_reduced$s,
+                 contribution = (results_contrib_rsharing_sp2_reduced$linear_reg_rsharing - results_contrib_rsharing_sp2_reduced$unif_rsharing) / results_contrib_rsharing_sp2_reduced$unif_rsharing,
+                 methode = rep("Régression linéaire", nrow(results_contrib_rsharing_sp2_reduced)))
+
+(j$contribution[10000] - j$contribution[10]) / (j$s[10000] - j$s[10])
+
+(j$contribution[20000] - j$contribution[10000]) / (j$s[20000] - j$s[10000])
 
 
 # Référence :
 # https://stackoverflow.com/questions/14794599/how-to-change-line-width-in-ggplot
-ggplot(results_contrib_rsharing_sp2_reduced_joined) +
-    geom_line(aes(s / 1000, contribution, col = methode), size=1.4) +
-    xlab("s (en milliers)") +
-    ylab("Contribution") +
-    xlim(50000 / 1000, 120000 / 1000) +
-    ylim(50, 130) +
-    theme_classic() +
-    theme(axis.text = element_text(size=12),
-          axis.title = element_text(size=12),
-          legend.text = element_text(size=9),
-          legend.position = "bottom") +
-    guides(col = guide_legend(title = "Méthode"))
+#ggplot(results_contrib_rsharing_sp2_reduced_joined) +
+#    geom_line(aes(s / 1000, contribution, col = methode), size=1.4) +
+#    xlab("s (en milliers)") +
+#    ylab("Contribution") +
+#    xlim(50000 / 1000, 120000 / 1000) +
+#    ylim(50, 130) +
+#    theme_classic() +
+#    theme(axis.text = element_text(size=12),
+#          axis.title = element_text(size=12),
+#          legend.text = element_text(size=9),
+#          legend.position = "bottom") +
+#    guides(col = guide_legend(title = "Méthode"))
 
 
 # Échantillon du sous-pool 3
@@ -241,7 +274,7 @@ unif_rsharing_sp3_r1 <- support_S / RISK_ECH_SIZE
 mean_prop_rsharing_sp3_r1 <- (EX_sp3_r1 / ES_sp3) * support_S
 linear_reg_rsharing_sp3_r1 <- EX_sp3_r1 + (VarX_sp3_r1 / VarS_sp3) * (support_S - ES_sp3)
 cm_rsharing_sp3 <- compute_cm(nfft, h, subpool3_ech, "unbiased")
-# Temps : 258.1 secondes, 2025-04-04, avec "unbiased".
+# Temps : 250.8 secondes, 2025-04-04, avec "unbiased".
 cm_rsharing_sp3_r1 <- cm_rsharing_sp3$contrib[[1]]
 
 results_contrib_rsharing_sp3 <- data.frame(s = support_S,
@@ -261,34 +294,304 @@ cm_rsharing_sp3_r1[220000 / h]
 
 results_contrib_rsharing_sp3_reduced <- results_contrib_rsharing_sp3[(110100:219900) / h,]
 
+# results_contrib_rsharing_sp3_reduced_joined <- rbind(data.frame(s = results_contrib_rsharing_sp3_reduced$s,
+#                                                                 contribution = results_contrib_rsharing_sp3_reduced$unif_rsharing,
+#                                                                 methode = rep("Uniforme", nrow(results_contrib_rsharing_sp3_reduced))),
+#                                                      data.frame(s = results_contrib_rsharing_sp3_reduced$s,
+#                                                                 contribution = results_contrib_rsharing_sp3_reduced$mean_prop_rsharing,
+#                                                                 methode = rep("Au prorata des espérances", nrow(results_contrib_rsharing_sp3_reduced))),
+#                                                      data.frame(s = results_contrib_rsharing_sp3_reduced$s,
+#                                                                 contribution = results_contrib_rsharing_sp3_reduced$linear_reg_rsharing,
+#                                                                 methode = rep("Régression linéaire", nrow(results_contrib_rsharing_sp3_reduced))),
+#                                                      data.frame(s = results_contrib_rsharing_sp3_reduced$s,
+#                                                                 contribution = results_contrib_rsharing_sp3_reduced$cm_rsharing,
+#                                                                 methode = rep("Espérance conditionnelle", nrow(results_contrib_rsharing_sp3_reduced))))
+
+
 results_contrib_rsharing_sp3_reduced_joined <- rbind(data.frame(s = results_contrib_rsharing_sp3_reduced$s,
-                                                                contribution = results_contrib_rsharing_sp3_reduced$unif_rsharing,
-                                                                methode = rep("Uniforme", nrow(results_contrib_rsharing_sp3_reduced))),
-                                                     data.frame(s = results_contrib_rsharing_sp3_reduced$s,
-                                                                contribution = results_contrib_rsharing_sp3_reduced$mean_prop_rsharing,
+                                                                contribution = (results_contrib_rsharing_sp3_reduced$mean_prop_rsharing - results_contrib_rsharing_sp3_reduced$unif_rsharing) / results_contrib_rsharing_sp3_reduced$unif_rsharing,
                                                                 methode = rep("Au prorata des espérances", nrow(results_contrib_rsharing_sp3_reduced))),
                                                      data.frame(s = results_contrib_rsharing_sp3_reduced$s,
-                                                                contribution = results_contrib_rsharing_sp3_reduced$linear_reg_rsharing,
+                                                                contribution = (results_contrib_rsharing_sp3_reduced$linear_reg_rsharing - results_contrib_rsharing_sp3_reduced$unif_rsharing) / results_contrib_rsharing_sp3_reduced$unif_rsharing,
                                                                 methode = rep("Régression linéaire", nrow(results_contrib_rsharing_sp3_reduced))),
                                                      data.frame(s = results_contrib_rsharing_sp3_reduced$s,
-                                                                contribution = results_contrib_rsharing_sp3_reduced$cm_rsharing,
+                                                                contribution = (results_contrib_rsharing_sp3_reduced$cm_rsharing - results_contrib_rsharing_sp3_reduced$unif_rsharing) / results_contrib_rsharing_sp3_reduced$unif_rsharing,
                                                                 methode = rep("Espérance conditionnelle", nrow(results_contrib_rsharing_sp3_reduced))))
 
 
 # Référence :
 # https://stackoverflow.com/questions/14794599/how-to-change-line-width-in-ggplot
-ggplot(results_contrib_rsharing_sp3_reduced_joined) +
+#ggplot(results_contrib_rsharing_sp3_reduced_joined) +
+#    geom_line(aes(s / 1000, contribution, col = methode), size=1.4) +
+#    xlab("s (en milliers)") +
+#    ylab("Contribution") +
+#    xlim(110000 / 1000, 220000 / 1000) +
+#    ylim(50, 300) +
+#    theme_classic() +
+#    theme(axis.text = element_text(size=12),
+#          axis.title = element_text(size=12),
+#          legend.text = element_text(size=9),
+#          legend.position = "bottom") +
+#    guides(col = guide_legend(title = "Méthode"))
+
+
+fig1 <- ggplot(results_contrib_rsharing_sp1_reduced_joined) +
     geom_line(aes(s / 1000, contribution, col = methode), size=1.4) +
+    geom_hline(yintercept=0, linetype=2) +
+    geom_vline(xintercept = ES_sp1 / 1000, linetype=2) +
+    annotate("text", x = 54000 / 1000, y = -0.01, label = "E[S]", size=10) +
     xlab("s (en milliers)") +
-    ylab("Contribution") +
-    xlim(110000 / 1000, 220000 / 1000) +
-    ylim(50, 300) +
+    ylab("Différence par rapport à la règle uniforme (%)") +
+    title("Sous-pool 1") +
+    xlim(30000 / 1000, 90000 / 1000) +
     theme_classic() +
-    theme(axis.text = element_text(size=12),
-          axis.title = element_text(size=12),
-          legend.text = element_text(size=9),
+    theme(axis.text = element_text(size=20),
+          axis.title = element_text(size=24),
+          legend.text = element_text(size=18),
+          legend.title = element_text(size=18),
+          title = element_text(size=22),
           legend.position = "bottom") +
     guides(col = guide_legend(title = "Méthode"))
+ggsave(fig1, file="profil-risque-1.pdf", width=10, height=8)
+
+
+fig2 <- ggplot(results_contrib_rsharing_sp2_reduced_joined) +
+    geom_line(aes(s / 1000, contribution, col = methode), size=1.4) +
+    geom_hline(yintercept=0, linetype=2) +
+    geom_vline(xintercept = ES_sp2 / 1000, linetype=2) +
+    annotate("text", x = 95000 / 1000, y = 0.1, label = "E[S]", size=10) +
+    xlab("s (en milliers)") +
+    ylab("Différence par rapport à la règle uniforme (%)") +
+    title("Sous-pool 2") +
+    xlim(50000 / 1000, 120000 / 1000) +
+    theme_classic() +
+    theme(axis.text = element_text(size=20),
+          axis.title = element_text(size=20),
+          legend.text = element_text(size=14),
+          legend.title = element_text(size=16),
+          title = element_text(size=22),
+          legend.position = "bottom") +
+    guides(col = guide_legend(title = "Méthode"))
+ggsave(fig2, file="profil-risque-2.pdf", width=10, height=8)
+
+
+fig3 <- ggplot(results_contrib_rsharing_sp3_reduced_joined) +
+    geom_line(aes(s / 1000, contribution, col = methode), size=1.4) +
+    geom_hline(yintercept=0, linetype=2) +
+    geom_vline(xintercept = ES_sp3 / 1000, linetype=2) +
+    annotate("text", x = 173000 / 1000, y = 0.06, label = "E[S]", size=10) +
+    xlab("s (en milliers)") +
+    ylab("Différence par rapport à la règle uniforme (%)") +
+    title("Sous-pool 3") +
+    xlim(110000 / 1000, 220000 / 1000) +
+    theme_classic() +
+    theme(axis.text = element_text(size=20),
+          axis.title = element_text(size=20),
+          legend.text = element_text(size=14),
+          legend.title = element_text(size=16),
+          title = element_text(size=22),
+          legend.position = "bottom") +
+    guides(col = guide_legend(title = "Méthode"))
+ggsave(fig3, file="profil-risque-3.pdf", width=10, height=8)
+
+
+# Exportation finale des figures
+# obj_ggarrange <- ggarrange(fig1, fig2, fig3,
+#                            nrow = 3, common.legend = TRUE,
+#                            labels = c("Sous-pool 1", "Sous-pool 2",
+#                                       "Sous-pool 3"),
+#                            legend = "bottom",
+#                            font.label = list(size=20))
+
+obj_ggarrange <- ggarrange(fig1, fig2, fig3,
+                           nrow = 3, common.legend = TRUE,
+                           legend = "bottom",
+                           labels = c("Sous-pool 1",
+                                      "Sous-pool 2",
+                                      "Sous-pool 3"),
+                           hjust = -1,
+                           font.label = list(size=20))
+
+
+ggsave(obj_ggarrange, file="profils-de-risque-ex-num-1.pdf",
+       width = 10, height = 24)
+
+
+
+
+# Tests supplémentaires
+# (1) Mélange de sous-pools
+# (2) Variation de n
+
+
+# (1)
+
+# risk_ech_subpool1 <- subpool1_ech[subpool1_ech$id == id_risk_ech_subpool1,]
+# risk_ech_subpool2 <- subpool2_ech[subpool2_ech$id == id_risk_ech_subpool2,]
+# risk_ech_subpool3 <- subpool3_ech[subpool3_ech$id == id_risk_ech_subpool3,]
+set.seed(11)
+subpool123_ech <- rbind(
+    risk_ech_subpool1,
+    risk_ech_subpool2,
+    risk_ech_subpool3,
+    subpool1[sample(seq(SUBPOOL1_SIZE), 499),],
+    subpool2[sample(seq(SUBPOOL2_SIZE), 499),],
+    subpool3[sample(seq(SUBPOOL3_SIZE), 499),]
+)
+
+subpool123_ech_SIZE <- nrow(subpool123_ech)
+
+
+# Échantillon du sous-pool 1
+nfft <- 2^17
+h <- 5
+support_S <- (c(0, seq(nfft - 1)) * h)
+
+ES_pool_melange <- sum(subpool123_ech$lambda * subpool123_ech$alpha / subpool123_ech$beta)
+EX_pool_melange_r1 <- subpool123_ech$lambda[1] * subpool123_ech$alpha[1] / subpool123_ech$beta[1]
+EX_pool_melange_r2 <- subpool123_ech$lambda[2] * subpool123_ech$alpha[2] / subpool123_ech$beta[2]
+EX_pool_melange_r3 <- subpool123_ech$lambda[3] * subpool123_ech$alpha[3] / subpool123_ech$beta[3]
+
+VarS_pool_melange <- sum((subpool123_ech$lambda * subpool123_ech$alpha / (subpool123_ech$beta^2)) * (subpool123_ech$alpha + 1))
+
+VarX_pool_melange_r1 <- (subpool123_ech$lambda[1] * subpool123_ech$alpha[1] / (subpool123_ech$beta[1]^2)) * (subpool123_ech$alpha[1] + 1)
+VarX_pool_melange_r2 <- (subpool123_ech$lambda[2] * subpool123_ech$alpha[2] / (subpool123_ech$beta[2]^2)) * (subpool123_ech$alpha[2] + 1)
+VarX_pool_melange_r3 <- (subpool123_ech$lambda[3] * subpool123_ech$alpha[3] / (subpool123_ech$beta[3]^2)) * (subpool123_ech$alpha[3] + 1)
+
+unif_rsharing_pool_melange <- support_S / subpool123_ech_SIZE
+
+mean_prop_rsharing_pool_melange_r1 <- (EX_pool_melange_r1 / ES_pool_melange) * support_S
+mean_prop_rsharing_pool_melange_r2 <- (EX_pool_melange_r2 / ES_pool_melange) * support_S
+mean_prop_rsharing_pool_melange_r3 <- (EX_pool_melange_r3 / ES_pool_melange) * support_S
+
+linear_reg_rsharing_pool_melange_r1 <- EX_pool_melange_r1 + (VarX_pool_melange_r1 / VarS_pool_melange) * (support_S - ES_pool_melange)
+linear_reg_rsharing_pool_melange_r2 <- EX_pool_melange_r2 + (VarX_pool_melange_r2 / VarS_pool_melange) * (support_S - ES_pool_melange)
+linear_reg_rsharing_pool_melange_r3 <- EX_pool_melange_r3 + (VarX_pool_melange_r3 / VarS_pool_melange) * (support_S - ES_pool_melange)
+
+
+
+
+cm_rsharing_pool_melange <- compute_cm(nfft, h, subpool123_ech, "unbiased")
+# Temps : 367.4 secondes, 2025-04-07, avec "unbiased".
+cm_rsharing_pool_melange_r1 <- cm_rsharing_pool_melange$contrib[[1]]
+cm_rsharing_pool_melange_r2 <- cm_rsharing_pool_melange$contrib[[2]]
+cm_rsharing_pool_melange_r3 <- cm_rsharing_pool_melange$contrib[[3]]
+
+# results_contrib_rsharing_sp1 <- data.frame(s = support_S,
+#                                            unif_rsharing = unif_rsharing_sp1_r1,
+#                                            mean_prop_rsharing = mean_prop_rsharing_sp1_r1,
+#                                            linear_reg_rsharing = linear_reg_rsharing_sp1_r1,
+#                                            cm_rsharing = cm_rsharing_sp1_r1)
+
+# À quelles valeurs de "S" présenter le graphique?
+plot(0:(nfft-1) * h, cm_rsharing_pool_melange$fs)
+sum(cm_rsharing_pool_melange$fs)
+
+results_contrib_rsharing_reduced_joined_sp123_r1 <- rbind(data.frame(s = support_S[(100000:200000) / h],
+                                                                     contribution = (mean_prop_rsharing_pool_melange_r1[(100000:200000) / h] - unif_rsharing_pool_melange[(100000:200000) / h]) / unif_rsharing_pool_melange[(100000:200000) / h],
+                                                                     methode = rep("Au prorata des espérances", length(support_S[(100000:200000) / h]))),
+                                                          data.frame(s = support_S[(100000:200000) / h],
+                                                                     contribution = (linear_reg_rsharing_pool_melange_r1[(100000:200000) / h] - unif_rsharing_pool_melange[(100000:200000) / h]) / unif_rsharing_pool_melange[(100000:200000) / h],
+                                                                     methode = rep("Régression linéaire", length(support_S[(100000:200000) / h]))),
+                                                          data.frame(s = support_S[(100000:200000) / h],
+                                                                     contribution = (cm_rsharing_pool_melange_r1[(100000:200000) / h] - unif_rsharing_pool_melange[(100000:200000) / h]) / unif_rsharing_pool_melange[(100000:200000) / h],
+                                                                     methode = rep("Espérance conditionnelle", length(support_S[(100000:200000) / h]))))
+
+results_contrib_rsharing_reduced_joined_sp123_r2 <- rbind(data.frame(s = support_S[(100000:200000) / h],
+                                                                     contribution = (mean_prop_rsharing_pool_melange_r2[(100000:200000) / h] - unif_rsharing_pool_melange[(100000:200000) / h]) / unif_rsharing_pool_melange[(100000:200000) / h],
+                                                                     methode = rep("Au prorata des espérances", length(support_S[(100000:200000) / h]))),
+                                                          data.frame(s = support_S[(100000:200000) / h],
+                                                                     contribution = (linear_reg_rsharing_pool_melange_r2[(100000:200000) / h] - unif_rsharing_pool_melange[(100000:200000) / h]) / unif_rsharing_pool_melange[(100000:200000) / h],
+                                                                     methode = rep("Régression linéaire", length(support_S[(100000:200000) / h]))),
+                                                          data.frame(s = support_S[(100000:200000) / h],
+                                                                     contribution = (cm_rsharing_pool_melange_r2[(100000:200000) / h] - unif_rsharing_pool_melange[(100000:200000) / h]) / unif_rsharing_pool_melange[(100000:200000) / h],
+                                                                     methode = rep("Espérance conditionnelle", length(support_S[(100000:200000) / h]))))
+
+results_contrib_rsharing_reduced_joined_sp123_r3 <- rbind(data.frame(s = support_S,
+                                                                     contribution = (mean_prop_rsharing_pool_melange_r3 - unif_rsharing_pool_melange) / unif_rsharing_pool_melange,
+                                                                     methode = rep("Au prorata des espérances", length(support_S))),
+                                                          data.frame(s = support_S,
+                                                                     contribution = (linear_reg_rsharing_pool_melange_r3 - unif_rsharing_pool_melange) / unif_rsharing_pool_melange,
+                                                                     methode = rep("Régression linéaire", length(support_S))),
+                                                          data.frame(s = support_S,
+                                                                     contribution = (cm_rsharing_pool_melange_r3- unif_rsharing_pool_melange) / unif_rsharing_pool_melange,
+                                                                     methode = rep("Espérance conditionnelle", length(support_S))))
+
+
+
+fig1 <- ggplot(results_contrib_rsharing_reduced_joined_sp123_r1) +
+    geom_line(aes(s / 1000, contribution, col = methode), size=1.4) +
+    geom_hline(yintercept=0, linetype=2) +
+    geom_vline(xintercept = ES_pool_melange / 1000, linetype=2) +
+    annotate("text", x = 160000 / 1000, y = -0.425, label = "E[S]", size=10) +
+    xlab("s (en milliers)") +
+    ylab("Différence par rapport à la règle uniforme (%)") +
+    title("Risque 1") +
+    xlim(100000 / 1000, 200000 / 1000) +
+    ylim(-0.6, -0.4) +
+    theme_classic() +
+    theme(axis.text = element_text(size=20),
+          axis.title = element_text(size=24),
+          legend.text = element_text(size=18),
+          legend.title = element_text(size=18),
+          title = element_text(size=22),
+          legend.position = "bottom") +
+    guides(col = guide_legend(title = "Méthode"))
+
+
+fig2 <- ggplot(results_contrib_rsharing_reduced_joined_sp123_r2) +
+    geom_line(aes(s / 1000, contribution, col = methode), size=1.4) +
+    geom_hline(yintercept=0, linetype=2) +
+    geom_vline(xintercept = ES_pool_melange / 1000, linetype=2) +
+    annotate("text", x = 160000 / 1000, y = 0.03, label = "E[S]", size=10) +
+    xlab("s (en milliers)") +
+    ylab("Différence par rapport à la règle uniforme (%)") +
+    title("Risque 2") +
+    xlim(100000 / 1000, 200000 / 1000) +
+    ylim(-0.15, 0.05) +
+    theme_classic() +
+    theme(axis.text = element_text(size=20),
+          axis.title = element_text(size=20),
+          legend.text = element_text(size=14),
+          legend.title = element_text(size=16),
+          title = element_text(size=22),
+          legend.position = "bottom") +
+    guides(col = guide_legend(title = "Méthode"))
+
+
+fig3 <- ggplot(results_contrib_rsharing_reduced_joined_sp123_r3) +
+    geom_line(aes(s / 1000, contribution, col = methode), size=1.4) +
+    geom_hline(yintercept=0, linetype=2) +
+    geom_vline(xintercept = ES_pool_melange / 1000, linetype=2) +
+    annotate("text", x = 160000 / 1000, y = 0.73, label = "E[S]", size=10) +
+    xlab("s (en milliers)") +
+    ylab("Différence par rapport à la règle uniforme (%)") +
+    title("Risque 3") +
+    xlim(100000 / 1000, 200000 / 1000) +
+    ylim(0.6, 0.75) +
+    theme_classic() +
+    theme(axis.text = element_text(size=20),
+          axis.title = element_text(size=20),
+          legend.text = element_text(size=14),
+          legend.title = element_text(size=16),
+          title = element_text(size=22),
+          legend.position = "bottom") +
+    guides(col = guide_legend(title = "Méthode"))
+
+
+# Exportation finale des figures
+obj_ggarrange <- ggarrange(fig1, fig2, fig3,
+                           nrow = 3, common.legend = TRUE,
+                           legend = "bottom",
+                           labels = c("Risque 1",
+                                      "Risque 2",
+                                      "Risque 3"),
+                           hjust = -1,
+                           font.label = list(size=20))
+
+
+ggsave(obj_ggarrange, file="profils-de-risque-ex-num-1-melange-sous-pools.pdf",
+       width = 10, height = 24)
 
 
 
