@@ -29,6 +29,15 @@ hist(purepremiums, freq = FALSE)
 
 df_params <- cbind(test, alpha = alphas, beta = betas, lambda = lambdas,
                    premium = purepremiums)
+
+ggplot(df_params, aes(x = purepremiums, y = after_stat(density))) +
+    geom_histogram(fill = "skyblue", binwidth = 5) +
+    geom_vline(xintercept = 101.3983, color = "black", linewidth = 1.2, linetype = "dashed") +
+    annotate("text", x = 101.3983, y = 0.0063, label = "Prime moyenne: 101.3983", hjust = -0.1, color = "black") +
+    theme_minimal() +
+    labs(x = "Prime pure (euros)", y = "Densité")
+ggsave("repart_primes.pdf")
+
 summary(df_params)
 
 ggplot(df_params, aes(x = long, y = lat, size = premium,
