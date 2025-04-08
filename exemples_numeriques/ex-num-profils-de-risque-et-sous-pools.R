@@ -107,7 +107,7 @@ source("algorithms/cond_mean_rsharing_FFT_Blier.R")
 source("algorithms/mean_prop_rsharing.R")
 source("algorithms/linear_reg_rsharing.R")
 
-
+#load("exemples_numeriques/results_contrib_rsharing_souspools.RData")
 # Échantillon du sous-pool 1
 nfft <- 2^17
 h <- 5
@@ -139,8 +139,8 @@ sum(cm_rsharing_sp1$fs)
 cm_rsharing_sp1_r1[30100 / h]
 cm_rsharing_sp1_r1[89900 / h]
 
-results_contrib_rsharing_sp1_reduced <- results_contrib_rsharing_sp1[(30100:89900) / h,]
-
+results_contrib_rsharing_sp1_reduced <- results_contrib_rsharing_sp1[(30100:130900) / h,]
+#results_contrib_rsharing_sp1_reduced <- results_contrib_rsharing_sp1[(30100:120000) / h,]
 # results_contrib_rsharing_sp1_reduced_joined <- rbind(data.frame(s = results_contrib_rsharing_sp1_reduced$s,
 #                                                                 contribution = results_contrib_rsharing_sp1_reduced$unif_rsharing,
 #                                                                 methode = rep("Uniforme", nrow(results_contrib_rsharing_sp1_reduced))),
@@ -212,7 +212,8 @@ cm_rsharing_sp2_r1[50000 / h]
 cm_rsharing_sp2_r1[120000 / h]
 
 
-results_contrib_rsharing_sp2_reduced <- results_contrib_rsharing_sp2[(50100:119900) / h,]
+results_contrib_rsharing_sp2_reduced <- results_contrib_rsharing_sp2[(30100:200900) / h,]
+#results_contrib_rsharing_sp2_reduced <- results_contrib_rsharing_sp2[(50000:120000) / h,]
 
 # results_contrib_rsharing_sp2_reduced_joined <- rbind(data.frame(s = results_contrib_rsharing_sp2_reduced$s,
 #                                                                 contribution = results_contrib_rsharing_sp2_reduced$unif_rsharing,
@@ -292,7 +293,8 @@ cm_rsharing_sp3_r1[110000 / h]
 cm_rsharing_sp3_r1[220000 / h]
 
 
-results_contrib_rsharing_sp3_reduced <- results_contrib_rsharing_sp3[(110100:219900) / h,]
+results_contrib_rsharing_sp3_reduced <- results_contrib_rsharing_sp3[(100100:219900) / h,]
+#results_contrib_rsharing_sp3_reduced <- results_contrib_rsharing_sp3[(110000:219900) / h,]
 
 # results_contrib_rsharing_sp3_reduced_joined <- rbind(data.frame(s = results_contrib_rsharing_sp3_reduced$s,
 #                                                                 contribution = results_contrib_rsharing_sp3_reduced$unif_rsharing,
@@ -319,6 +321,10 @@ results_contrib_rsharing_sp3_reduced_joined <- rbind(data.frame(s = results_cont
                                                                 methode = rep("Espérance conditionnelle", nrow(results_contrib_rsharing_sp3_reduced))))
 
 
+# save(results_contrib_rsharing_sp1,
+#      results_contrib_rsharing_sp2,
+#      results_contrib_rsharing_sp3, file = "exemples_numeriques/results_contrib_rsharing_souspools.RData")
+
 # Référence :
 # https://stackoverflow.com/questions/14794599/how-to-change-line-width-in-ggplot
 #ggplot(results_contrib_rsharing_sp3_reduced_joined) +
@@ -343,7 +349,7 @@ fig1 <- ggplot(results_contrib_rsharing_sp1_reduced_joined) +
     xlab("s (en milliers)") +
     ylab("Différence par rapport à la règle uniforme (%)") +
     title("Sous-pool 1") +
-    xlim(30000 / 1000, 90000 / 1000) +
+    xlim(30000 / 1000, 220000 / 1000) +
     theme_classic() +
     theme(axis.text = element_text(size=20),
           axis.title = element_text(size=24),
@@ -363,7 +369,7 @@ fig2 <- ggplot(results_contrib_rsharing_sp2_reduced_joined) +
     xlab("s (en milliers)") +
     ylab("Différence par rapport à la règle uniforme (%)") +
     title("Sous-pool 2") +
-    xlim(50000 / 1000, 120000 / 1000) +
+    xlim(30000 / 1000, 220000 / 1000) +
     theme_classic() +
     theme(axis.text = element_text(size=20),
           axis.title = element_text(size=20),
@@ -372,7 +378,7 @@ fig2 <- ggplot(results_contrib_rsharing_sp2_reduced_joined) +
           title = element_text(size=22),
           legend.position = "bottom") +
     guides(col = guide_legend(title = "Méthode"))
-ggsave(fig2, file="profil-risque-2.pdf", width=10, height=8)
+ggsave(fig2, file="profil-risque-2-scale-commune.pdf", width=10, height=8)
 
 
 fig3 <- ggplot(results_contrib_rsharing_sp3_reduced_joined) +
@@ -383,7 +389,7 @@ fig3 <- ggplot(results_contrib_rsharing_sp3_reduced_joined) +
     xlab("s (en milliers)") +
     ylab("Différence par rapport à la règle uniforme (%)") +
     title("Sous-pool 3") +
-    xlim(110000 / 1000, 220000 / 1000) +
+    xlim(30000 / 1000, 220000 / 1000) +
     theme_classic() +
     theme(axis.text = element_text(size=20),
           axis.title = element_text(size=20),
