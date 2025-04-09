@@ -543,6 +543,7 @@ fig1 <- ggplot(results_contrib_rsharing_reduced_joined_sp123_r1) +
           title = element_text(size=22),
           legend.position = "bottom") +
     guides(col = guide_legend(title = "Méthode"))
+ggsave(fig1, file="profil-risque-1-pool-melange.pdf", width=10, height=8)
 
 
 fig2 <- ggplot(results_contrib_rsharing_reduced_joined_sp123_r2) +
@@ -563,6 +564,7 @@ fig2 <- ggplot(results_contrib_rsharing_reduced_joined_sp123_r2) +
           title = element_text(size=22),
           legend.position = "bottom") +
     guides(col = guide_legend(title = "Méthode"))
+ggsave(fig2, file="profil-risque-2-pool-melange.pdf", width=10, height=8)
 
 
 fig3 <- ggplot(results_contrib_rsharing_reduced_joined_sp123_r3) +
@@ -583,6 +585,7 @@ fig3 <- ggplot(results_contrib_rsharing_reduced_joined_sp123_r3) +
           title = element_text(size=22),
           legend.position = "bottom") +
     guides(col = guide_legend(title = "Méthode"))
+ggsave(fig3, file="profil-risque-3-pool-melange.pdf", width=10, height=8)
 
 
 # Exportation finale des figures
