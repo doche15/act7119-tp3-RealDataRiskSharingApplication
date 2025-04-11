@@ -111,6 +111,35 @@ sum(cm_rsharing_pool_melange$fs)
 cm_rsharing_pool_melange_r1 <- cm_rsharing_pool_melange$contrib[[1]]
 cm_rsharing_pool_melange_r2 <- cm_rsharing_pool_melange$contrib[[2]]
 cm_rsharing_pool_melange_r3 <- cm_rsharing_pool_melange$contrib[[3]]
+fs <- cm_rsharing_pool_melange$fs
+
+esperances <- subpool123_ech$lambda * subpool123_ech$alpha / subpool123_ech$beta
+variances <- subpool123_ech$lambda * subpool123_ech$alpha / subpool123_ech$beta^2 *
+                        (1 + subpool123_ech$alpha)
+
+(vars <- sum(variances))
+(es <- sum(esperances))
+n <- nrow(subpool123_ech)
+
+(var1 <- variances[1])
+(varHuni_1 <- vars / n^2 )
+(varHprop_1 <- (esperances[1] / es)^2 * vars)
+(varHreg_1 <- (variances[1] / vars)^2 * vars)
+(varHcm_1 <- sum(cm_rsharing_pool_melange_r1[1:80000]^2 * fs[1:80000]) - sum(cm_rsharing_pool_melange_r1[1:80000] * fs[1:80000])^2)
+
+(var2 <- variances[2])
+(varHuni_2 <- vars / n^2 )
+(varHprop_2 <- (esperances[2] / es)^2 * vars)
+(varHreg_2 <- (variances[2] / vars)^2 * vars)
+(varHcm_2 <- sum(cm_rsharing_pool_melange_r2[1:80000]^2 * fs[1:80000]) - sum(cm_rsharing_pool_melange_r2[1:80000] * fs[1:80000])^2)
+
+(var3 <- variances[3])
+(varHuni_3 <- vars / n^2 )
+(varHprop_3 <- (esperances[3] / es)^2 * vars)
+(varHreg_3 <- (variances[3] / vars)^2 * vars)
+(varHcm_3 <- sum(cm_rsharing_pool_melange_r3[1:80000]^2 * fs[1:80000]) - sum(cm_rsharing_pool_melange_r3[1:80000] * fs[1:80000])^2)
+
+
 
 
 # Simulation
